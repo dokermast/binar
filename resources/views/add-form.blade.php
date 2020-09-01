@@ -7,6 +7,9 @@
             <div class="col-3"></div>
 
             <div class="col-6">
+                <br>
+                <div class="text-center"><h3>ADD BINAR FORM</h3></div>
+                <br>
                 <form action="{{ route('save') }}" method="post">
                     @csrf
                         <div class="form-group">
@@ -32,6 +35,7 @@
 
             <div class="col-3"></div>
         </div>
+        <div class="text-center"><a href="{{ route('main') }}" class="btn btn-secondary">to Main Page</a></div>
     </div>
 
     <script src="public/js/jquery-3.5.1.min.js"></script>

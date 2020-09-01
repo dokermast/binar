@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="text-center">
-        <h3>Binar Main</h3>
+        <h3>Main PAGE</h3>
         <br>
         <a href="{{ route('add') }}" class="btn btn-primary">Add Binar</a>
         <br>

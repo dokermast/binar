@@ -13,15 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'MainController@main')->name('main');
-Route::get('/list', 'MainController@list')->name('list');
-Route::get('/add', 'MainController@add')->name('add');
-Route::post('/save', 'MainController@save')->name('save');
-Route::get('/relatives/{id}', 'MainController@getRelatives')->name('relatives');
-Route::get('/positions/{id}', 'MainController@getAvailablePosition');
+Route::get('/', 'BinarController@main')->name('main');
+Route::get('/list', 'BinarController@list')->name('list');
+Route::get('/add', 'BinarController@add')->name('add');
+Route::post('/save', 'BinarController@save')->name('save');
+Route::get('/relatives/{id}', 'BinarController@getRelatives')->name('relatives');
+Route::get('/positions/{id}', 'BinarController@getAvailablePosition');
 
 
-
-//Route::get('/', function () {
-//    return view('welcome');
-//});

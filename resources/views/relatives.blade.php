@@ -5,7 +5,7 @@
     <div class="text-center">
         <h3>Binar Relatives ID: {{ $id }}</h3>
         <br>
-        <a href="{{ route('main') }}" class="btn btn-primary">to Main Page</a>
+        <a href="{{ route('main') }}" class="btn btn-secondary">to Main Page</a>
         <br>
         <br>
         <br>
@@ -25,7 +25,14 @@
                 </tr>
                 </thead>
                 @foreach ($relatives as $item)
-                    <tr>
+
+                    @if($item->id == $id)
+                        @php $bgrd = 'background: lightgrey'; @endphp
+                    @else
+                        @php $bgrd = ''; @endphp
+                    @endif
+
+                    <tr style="{{ $bgrd }}">
                         <td>{{ $item->id}}</td>
                         <td>{{ $item->parent_id}}</td>
                         <td>{{ $item->position}}</td>

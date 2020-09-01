@@ -3,117 +3,124 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\BinarNode;
 use App\Binar;
 
 class BinarController extends Controller
 {
-    protected $root = NULL;
-
-    public function isEmpty ()
+    public function main()
     {
-        return is_null($this->root);
+        $binars = Binar::all();
+
+        return view('main', compact('binars'));
+    }
+
+    public function add()
+    {
+        $level_limit = 5;
+        $unavailabled_parents_ids = $this->getUnavailableParents();
+        $parents = Binar::where('level', '<', $level_limit)->get();
+        $parents = $parents->except($unavailabled_parents_ids);
+
+        return view('add-form', compact('parents'));
     }
 
 
-    public function insert ($value)
+    public function save(Request $request)
     {
-        $node = new BinarNode($value);
-        $this->insertNode($node, $this->root);
+        $input = $request->except('_token');
+
+        $node = new Binar();
+        $parent_id = (int)$input['parent_id'];
+        $position = (int)$input['position'];
+        $parent_node = Binar::find($parent_id);
+
+        $level = $parent_node->level + 1;
+
+        if ($level > 5){
+            return redirect(route('main'))->withErrors('Level should be less then 5');
+        }
+
+        $node->parent_id = $parent_id;
+        $node->position = $position;
+        $node->level = $level;
+
+        $node->save();
+        $node->path = $parent_node->path . '.' . $node->id;
+        $node->update();
+
+        return redirect(route('main'));
     }
 
 
-    protected function insertNode (BinarNode $node, &$subtree)
+    /**
+     * @return array
+     *
+     * return binars ids has two children
+     */
+    public function getUnavailableParents()
     {
-        if (is_null($subtree)){
-            $subtree = $node;
-        } else {
-            if ($node->value < $subtree->value) {
-                $subtree->position = BinarNode::LEFT;
-                $this->insertNode($node, $subtree->position);
-            } elseif ($node->value > $subtree->value) {
-                $subtree->position = BinarNode::RIGHT;
-                $this->insertNode($node, $subtree->position);
+        $binars = Binar::all();
+        $parent_ar = [];
+
+        foreach( $binars as $item) {
+
+            if (!in_array($item->parent_id, array_keys($parent_ar ))) {
+                $parent_ar += [$item->parent_id => 1];
+            } elseif (in_array($item->parent_id,array_keys($parent_ar ))) {
+                foreach ($parent_ar as $key=>$val) {
+                    if ( $key == $item->parent_id) {
+                        $parent_ar[$key] = $val + 1;
+                    }
+                }
             }
         }
-        return $this;
-    }
-
-    public function delete ($value)
-    {
-        if ($this->isEmpty()) {
-            throw new \UnderflowException('Tree is empty!');
-        }
-
-        $node = &$this->findNode($value, $this->root);
-
-        if ($node) {
-            $this->deleteNode($node);
-        }
-
-        return $this;
-    }
-
-
-    protected function &findNode ($value, &$subtree)
-    {
-        if (is_null($subtree)) {
-
-            return FALSE;
-        }
-
-        if ($subtree->value > $value) {
-
-            $subtree->position = BinarNode::LEFT;
-
-            return $this->findNode($value, $subtree->left);
-
-        } elseif ($subtree->value < $value) {
-
-            $subtree->position = BinarNode::RIGHT;
-
-            return $this->findNode($value, $subtree->right);
-
-        } else {
-
-            return $subtree;
-        }
-    }
-
-    protected function deleteNode (BinarNode &$node)
-    {
-//        if (is_null($node->left) && is_null($node->right)) {
-        if (is_null($node->position)) {
-
-            $node = NULL;
-
-//        } elseif (is_null($node->left)) {
-        } elseif ($node->position == BinarNode::LEFT) {
-
-            $node = $node->position;
-
-//        }  elseif (is_null($node->right)) {
-        } elseif ($node->position == BinarNode::RIGHT) {
-
-            $node = $node->position;
-
-        } else {
-
-            if (is_null($node->right->left)) {
-
-                $node->right->left = $node->left;
-                $node = $node->right;
-
-            } else {
-
-                $node->value = $node->right->left->value;
-                $this->deleteNode($node->right->left);
+        $unavailable_parents = [];
+        foreach ($parent_ar as $key => $val) {
+            if ( $val == 2 ) {
+                $unavailable_parents[] = $key;
             }
         }
+
+        return $unavailable_parents;
     }
 
-    public function dump ()
+
+    public function getRelatives($id)
     {
-        var_dump($this->root);
+        $binar = Binar::find($id);
+        $path = $binar->path;
+        $upRelatives_ids = explode('.', $path);
+        array_pop($upRelatives_ids);
+        $upRelatives = Binar::find($upRelatives_ids);
+        $subRelatives = Binar::where('path', 'like', '%' . $id . '%')
+                                ->get();
+
+        $relatives = $upRelatives->merge($subRelatives);
+
+        return view('relatives', compact('relatives'), ['id' => $id ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return false|string
+     * return availabled binar positions
+     */
+    public function getAvailablePosition($id){
+
+        $binars = Binar::where('parent_id', '=', $id)->get();
+        $positions = [];
+        if(count($binars) == 1  ) {
+            foreach ($binars as $item) {
+                $positions = $binars[0]->position == Binar::LEFT ? [['value' => Binar::RIGHT, 'label' => "Right"]] : [['value' => Binar::LEFT , 'label' => "Left"]];
+            }
+        } elseif (count($binars) == 0) {
+            $positions = [
+                ['value' => Binar::LEFT , 'label' => "Left"],
+                ['value' => Binar::RIGHT, 'label' => "Right"]
+            ];
+        }
+
+        return json_encode($positions);
     }
 }

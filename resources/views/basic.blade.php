@@ -22,7 +22,7 @@
     </div>
 @endif
 
-<div class="text-center"><h5>binar basic</h5></div>
+{{--<div class="text-center"><h5>binar basic</h5></div>--}}
 
 @yield('content')
 
