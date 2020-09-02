@@ -38,8 +38,8 @@
         <div class="text-center"><a href="{{ route('main') }}" class="btn btn-secondary">to Main Page</a></div>
     </div>
 
-{{--    <script src="/public/js/jquery-3.5.1.min.js"></script>--}}
-    <script src="{{ asset('/public/js/jquery-3.5.1.min.js') }}"></script>
+    <script src="/public/js/jquery-3.5.1.min.js"></script>
+{{--    <script src="{{ asset('/public/js/jquery-3.5.1.min.js') }}"></script>--}}
 
     <script>
             $('#position').hide();
