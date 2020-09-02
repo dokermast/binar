@@ -18,6 +18,6 @@ Route::get('/list', 'BinarController@list')->name('list');
 Route::get('/add', 'BinarController@add')->name('add');
 Route::post('/save', 'BinarController@save')->name('save');
 Route::get('/relatives/{id}', 'BinarController@getRelatives')->name('relatives');
-Route::get('/positions/{id}', 'BinarController@getAvailablePosition');
+Route::get('/positions/{id}', 'BinarController@getAvailablePosition')->name('positions');
 
 

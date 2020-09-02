@@ -13,7 +13,7 @@
                 <form action="{{ route('save') }}" method="post">
                     @csrf
                         <div class="form-group">
-                            <label>Parent Node</label>
+                            <label>Parent Node</label>sudo
                             <select id="parent" name="parent_id" class="form-control">
                                 @foreach( $parents as $item)
                                     <option value="{{ $item->id }}">{{ $item->id }}</option>
@@ -38,10 +38,12 @@
         <div class="text-center"><a href="{{ route('main') }}" class="btn btn-secondary">to Main Page</a></div>
     </div>
 
-    <script src="/public/js/jquery-3.5.1.min.js"></script>
-{{--    <script src="{{ asset('/public/js/jquery-3.5.1.min.js') }}"></script>--}}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 
     <script>
+
+        var host = window.location.hostname;
+
             $('#position').hide();
             $('#button').hide();
 
@@ -51,7 +53,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: '/positions/'+ id,
+                    url: 'http://' + host + '/positions/'+ id,
                     success: function (data) {
                         let position = JSON.parse(data);
                         if(position){
