@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Binar;
 
 class BinarController extends Controller
@@ -17,7 +18,8 @@ class BinarController extends Controller
     public function add()
     {
         $level_limit = 5;
-        $unavailabled_parents_ids = $this->getUnavailableParents();
+//        $unavailabled_parents_ids = $this->getUnavailableParents();
+        $unavailabled_parents_ids = $this->getUnParents();
         $parents = Binar::where('level', '<', $level_limit)->get();
         $parents = $parents->except($unavailabled_parents_ids);
 
@@ -122,5 +124,21 @@ class BinarController extends Controller
         }
 
         return json_encode($positions);
+    }
+
+    public function getUnParents()
+    {
+        $binars = DB::table('binars')
+            ->select('parent_id')
+            ->groupBy('parent_id')
+            ->havingRaw('SUM(position) > 2')
+            ->get();
+
+        $ids = [];
+        foreach ($binars as $item){
+           $ids[] = ((array)$item)['parent_id'];
+        }
+
+        return $ids;
     }
 }
